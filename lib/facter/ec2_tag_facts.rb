@@ -87,7 +87,8 @@ else
   response2 = http.request(request2)
   r = response2.body
 
-  region = /.*-.*-[0-9]/.match(r)
+  #region = /.*-.*-[0-9]/.match(r)
+  region = r
 
   debug_msg("Region is #{region}")
 
