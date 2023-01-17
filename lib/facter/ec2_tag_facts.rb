@@ -46,7 +46,14 @@ begin
   http = Net::HTTP.new(uri.host, uri.port)
   http.open_timeout = 4
   http.read_timeout = 4
+  requesttoken = Net::HTTP::Put.new("/latest/api/token")
+  requesttoken["X-Aws-Ec2-Metadata-Token-Ttl-Seconds"] = "21600"
+  responset = http.request(requesttoken)
+  responsetoken = responset.body
+  debug_msg("responsetoken = #{responsetoken}")
+
   request = Net::HTTP::Get.new("/latest/meta-data/instance-id")
+  request["X-Aws-Ec2-Metadata-Token"] = responsetoken
   response = http.request(request)
   instance_id = response.body
 
@@ -75,7 +82,8 @@ else
   # for example we convert us-west-2b into us-west-2 in order to get the tags.
   #
 
-  request2 = Net::HTTP::Get.new("/latest/meta-data/placement/availability-zone")
+  request2 = Net::HTTP::Get.new("/latest/meta-data/placement/region")
+  request2["X-Aws-Ec2-Metadata-Token"] = responsetoken
   response2 = http.request(request2)
   r = response2.body
 
